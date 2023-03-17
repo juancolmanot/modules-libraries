@@ -48,6 +48,7 @@ module vector_statistics
                 x_n_avg(i) = 0._dp
             endif
         enddo
+
     
     end function x_n_avg
 

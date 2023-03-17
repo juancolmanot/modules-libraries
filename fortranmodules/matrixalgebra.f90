@@ -10,7 +10,7 @@ module matrixalgebra
 
         integer(dp), intent(in) :: n
         real(dp), intent(in)    :: a,b
-        integer(sp)             :: i
+        integer(dp)             :: i
         real(dp)                :: linspace(n)
 
         linspace = 0._dp
@@ -21,29 +21,54 @@ module matrixalgebra
     
     end function linspace
 
-    function sort(x)
+    function sort_minor(x)
         use precision
         implicit none
 
         real(dp), intent(in)    :: x(:)
         integer(dp)             :: i,n,min_idx
-        real(dp), allocatable   :: sort(:),x_1(:)
+        real(dp), allocatable   :: sort_minor(:),x_1(:)
         real(dp)                :: x_aux
 
         n = size(x)
 
-        allocate(sort(n),x_1(n))
+        allocate(sort_minor(n),x_1(n))
 
         x_1 = x
 
         do i = 1,n
-            sort(i) = minval(x_1(i:n))
+            sort_minor(i) = minval(x_1(i:n))
             min_idx = minloc(x_1(i:n), 1)
             x_aux = x_1(i)
-            x_1(i) = sort(i)
+            x_1(i) = sort_minor(i)
             x_1(i - 1 + min_idx) = x_aux
         enddo
 
-    end function sort
+    end function sort_minor
+
+    function sort_major(x)
+        use precision
+        implicit none
+
+        real(dp), intent(in)    :: x(:)
+        integer(dp)             :: i,n,min_idx
+        real(dp), allocatable   :: sort_major(:),x_1(:)
+        real(dp)                :: x_aux
+
+        n = size(x)
+
+        allocate(sort_major(n),x_1(n))
+
+        x_1 = x
+
+        do i = 1,n
+            sort_major(i) = maxval(x_1(i:n))
+            min_idx = maxloc(x_1(i:n), 1)
+            x_aux = x_1(i)
+            x_1(i) = sort_major(i)
+            x_1(i - 1 + min_idx) = x_aux
+        enddo
+
+    end function sort_major
 
 end module matrixalgebra
