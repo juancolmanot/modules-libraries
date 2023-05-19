@@ -16,3 +16,30 @@ double *linspace(double x0, double xn, unsigned int n) {
 
     return x_space;
 }
+
+double min(double* x) {
+
+    double minimum = 0;
+
+    for (unsigned int i = 0; i < sizeof x; i++) {
+        if (x[i] < minimum) {
+            minimum = x[i];
+        }
+    }
+
+    return minimum;
+
+}
+
+double max(double* x) {
+
+    double maximum = 0;
+
+    for (unsigned int i = 0; i < sizeof x; i++) {
+        if (x[i] > maximum) {
+            maximum = x[i];
+        }
+    }
+    
+    return maximum;
+}

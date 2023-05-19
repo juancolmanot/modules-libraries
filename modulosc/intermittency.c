@@ -27,8 +27,8 @@ bool ejection(double xn1, double xn, double ubr, double lbr) {
 
 void map_2d(double* x1, double* x, double alpha, double beta) {
     
-    x1[0] = 4.f * alpha * x[0] * (1.f - x[0]) + beta * x[1] * (1.f - x[0]);
-    x1[1] = 4.f * alpha * x[1] * (1.f - x[1]) + beta * x[0] * (1.f - x[1]);
+    x1[0] = (double)4 * alpha * x[0] * ((double)1 - x[0]) + beta * x[1] * ((double)1 - x[0]);
+    x1[1] = (double)4 * alpha * x[1] * ((double)1 - x[1]) + beta * x[0] * ((double)1 - x[1]);
 }
 
 void map_2d_n(double* x1, double* x, unsigned int n, double alpha, double beta) {
