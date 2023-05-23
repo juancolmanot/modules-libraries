@@ -3,9 +3,9 @@
 #include <math.h>
 #include <stdbool.h>
 
-bool reinjection(double xn1, double xn, double ubr, double lbr) {
+bool reinjection(double xn1, double xn, double ubr) {
 
-    if (xn1 < ubr && xn1 > lbr && xn > ubr && xn < lbr){
+    if (xn1 < ubr && xn > ubr){
         return true;
     }
     else {
@@ -13,9 +13,9 @@ bool reinjection(double xn1, double xn, double ubr, double lbr) {
     }
 }
 
-bool ejection(double xn1, double xn, double ubr, double lbr) {
+bool ejection(double xn1, double xn, double ubr) {
 
-    if (xn1 > ubr && xn1 < lbr && xn < ubr && xn > lbr) {
+    if (xn1 > ubr && xn < ubr) {
         return true;
     }
     else {

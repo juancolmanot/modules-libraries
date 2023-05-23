@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-bool reinjection(double xn1, double xn, double ubr, double lbr);
+bool reinjection(double xn1, double xn, double ubr);
 
-bool ejection(double xn1, double xn, double ubr, double lbr);
+bool ejection(double xn1, double xn, double ubr);
 
 /* Two dimensional map from Kim & Kye */
 void map_2d(double* x1, double* x, double alpha, double beta);
