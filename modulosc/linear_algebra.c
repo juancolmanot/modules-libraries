@@ -28,11 +28,11 @@ double* linspace_discrete(double x0, double xn, unsigned int n) {
     return x_space;
 }
 
-double min(double* x) {
+double min(double* x, unsigned int length) {
 
     double minimum = x[0];
 
-    for (unsigned int i = 0; i < sizeof x; i++) {
+    for (unsigned int i = 0; i < length; i++) {
         if (x[i] < minimum) {
             minimum = x[i];
         }
@@ -42,11 +42,11 @@ double min(double* x) {
 
 }
 
-double max(double* x) {
+double max(double* x, unsigned int length) {
 
     double maximum = 0;
 
-    for (unsigned int i = 0; i < sizeof x; i++) {
+    for (unsigned int i = 0; i < length; i++) {
         if (x[i] > maximum) {
             maximum = x[i];
         }

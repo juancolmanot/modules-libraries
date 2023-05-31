@@ -6,9 +6,9 @@ double* linspace(double x0, double xn, unsigned int n);
 
 double* linspace_discrete(double x0, double xn, unsigned int n);
 
-double min(double* x);
+double min(double* x, unsigned int length);
 
-double max(double* x);
+double max(double* x, unsigned int length);
 
 double distance(double* x);
 
