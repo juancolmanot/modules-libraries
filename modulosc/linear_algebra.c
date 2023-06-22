@@ -17,15 +17,45 @@ double *linspace(double x0, double xn, unsigned int n) {
     return x_space;
 }
 
+double* logspace(double exp0, double expn, unsigned int n) {
+
+    double delta_exp = (expn - exp0) / (double) (n - 1);
+    double *x_logspace = calloc(n, sizeof(double));
+
+    double exp_i = exp0;
+    
+    for (unsigned int i = 0; i < n; i++) {
+        x_logspace[i] = pow(10, exp_i);
+        exp_i += delta_exp;
+    }
+
+    return x_logspace;
+}
+
 double* linspace_discrete(double x0, double xn, unsigned int n) {
 
-    double* x_space = malloc(n * sizeof(double));
+    double* x_space = calloc(n, sizeof(double));
 
     for (unsigned int i = 0; i < n; i++){
         x_space[i] = x0 + i;
     }
 
     return x_space;
+}
+
+double *rotation_operator(double *x, double theta) {
+
+    double* x_rotated = calloc(2, sizeof(double));
+    
+    double x1_rotated, x2_rotated;
+
+    x1_rotated = cos(theta) * x[0] - sin(theta) * x[1];
+    x2_rotated = sin(theta) * x[0] + cos(theta) * x[1];
+
+    x_rotated[0] = x1_rotated;
+    x_rotated[1] = x2_rotated;
+
+    return x_rotated;
 }
 
 double min(double* x, unsigned int length) {
