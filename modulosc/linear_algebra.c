@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+void distance_line(double *x, double *x1, double *xerr) {
+
+    xerr[0] = fabs(x[0] - x1[0]) / sqrt(2);
+    xerr[1] = fabs(x[1] - x1[1]) / sqrt(2);
+}
+
 double *linspace(double x0, double xn, unsigned int n) {
 
     double dx;
@@ -15,6 +21,7 @@ double *linspace(double x0, double xn, unsigned int n) {
     }
 
     return x_space;
+    free(x_space);
 }
 
 double* logspace(double exp0, double expn, unsigned int n) {
@@ -30,6 +37,7 @@ double* logspace(double exp0, double expn, unsigned int n) {
     }
 
     return x_logspace;
+    free(x_logspace);
 }
 
 double* linspace_discrete(double x0, double xn, unsigned int n) {
@@ -41,21 +49,19 @@ double* linspace_discrete(double x0, double xn, unsigned int n) {
     }
 
     return x_space;
+    free(x_space);
 }
 
-double *rotation_operator(double *x, double theta) {
-
-    double* x_rotated = calloc(2, sizeof(double));
+void rotation_operator(double *xrot, double *x, double theta) {
     
-    double x1_rotated, x2_rotated;
+    xrot[0] = cos(theta) * x[0] - sin(theta) * x[1];
+    xrot[1] = sin(theta) * x[0] + cos(theta) * x[1];
+}
 
-    x1_rotated = cos(theta) * x[0] - sin(theta) * x[1];
-    x2_rotated = sin(theta) * x[0] + cos(theta) * x[1];
-
-    x_rotated[0] = x1_rotated;
-    x_rotated[1] = x2_rotated;
-
-    return x_rotated;
+void antirotation_operator(double *xrot, double *x, double theta) {
+    
+    xrot[0] = cos(theta) * x[0] + sin(theta) * x[1];
+    xrot[1] = - sin(theta) * x[0] + cos(theta) * x[1];
 }
 
 double min(double* x, unsigned int length) {
