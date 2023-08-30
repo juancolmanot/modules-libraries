@@ -11,6 +11,7 @@ typedef struct {
     double c;
 } Parameters;
 
+
 int lorenz(double t, double x[], double f[], void *params) {
     Parameters *p = (Parameters*)params;
     double sigma = p->a;
@@ -44,4 +45,15 @@ int jaclorenz(double t, double x[], double *dfdx, double dfdt[], void *params) {
 
     dfdt[0] = dfdt[1] = dfdt[2] = 0.0;
     return GSL_SUCCESS;
+}
+
+void lorenzH(double x[], double f[], double *U, double *K) {
+
+    double Ki, Ui;
+
+    Ki = 0.5 * (f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+    Ui = 0.5 * (x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
+
+    *U = Ui;
+    *K = Ki;
 }
