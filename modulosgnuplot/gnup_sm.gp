@@ -30,4 +30,4 @@ set title labels_p[3]
 
 load '/home/juan/cursos/modulosgnuplot/gnup_linestyles.gp'
 
-p for[i=1:n_plots] datafile_p u cols_p[i * 2 - 1]:cols_p[i * 2] t legends_p[i] w l linestyle i
+p for[i=1:n_plots] datafile_p u cols_p[i * 2 - 1]:cols_p[i * 2] t legends_p[i] linestyle 4
