@@ -1,5 +1,5 @@
-set style line 1 lc rgb 'black' lw 0.1 ps 0.2
-set style line 2 lc rgb 'red' lw 0.1 ps 0.2
+set style line 1 lc rgb 'black' lw 0.1 ps 1 pt 3
+set style line 2 lc rgb 'black' lw 0.1 ps 1 pt 6
 set style line 3 lc rgb 'blue' lw 0.1 ps 0.2
 set style line 4 lc rgb 'green' lw 0.1 ps 0.2
 set style line 5 lc rgb 'orange' lw 0.1 ps 0.2
