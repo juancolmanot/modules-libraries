@@ -99,3 +99,7 @@ void map_2d_n_rotated_u(double *xn1, double *xn, unsigned int n, double alpha, d
     }
     free(xn_aux);
 }
+
+double rpd(double x, void *params) {
+    return 0.1;
+}
