@@ -16,10 +16,11 @@ gsl_matrix *file_data(char filename[1024], int *shape){
     }
 
     gsl_matrix *data = gsl_matrix_alloc(shape[0], shape[1]);
-    float a, b;
+    float a, b, c;
 
     for (unsigned int i = 0; i < shape[0]; i++){
-        fscanf(file, "%f %f", &a, &b);
+        fscanf(file, "%f %f %f", &a, &b, &c);
+        printf("%f %f %f\n", a, b, c);
         gsl_matrix_set(data, i, 0, (double)a);
         gsl_matrix_set(data, i, 1, (double)b);
     }
