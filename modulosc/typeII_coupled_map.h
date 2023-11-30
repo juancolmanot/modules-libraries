@@ -5,9 +5,9 @@ typedef struct {
     double mu;
     double gamma;
     double b;
+    double eps;
 } Parameters;
 
-double LMBKx(double x, void *params);
-double LMBKy(double y, void *params);
+double *LMBK(double *x, void *params);
 
 #endif
