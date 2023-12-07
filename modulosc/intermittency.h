@@ -20,4 +20,6 @@ void map_2d_rotated_u(double *xn1, double *xn, double alpha, double beta);
 
 void map_2d_n_rotated_u(double *xn1, double *xn, unsigned int n, double alpha, double beta);
 
+double rpd(double x, double xc, double alpha);
+
 #endif

@@ -9,29 +9,18 @@ typedef struct {
     double mu;
     double gamma;
     double b;
+    double eps;
 } Parameters;
 
-double LMBKx(double x, void *params) {
+double *LMBK(double *x, void *params) {
     Parameters *p = (Parameters*)params;
     double mu = p->mu;
     double gamma = p->gamma;
     double b = p->b;
-    double x1;
-
-    x1 = -((1 + mu + gamma) * x + x * x * x) * exp(-b * x * x) + gamma * x;
-    
+    double eps = p->eps;
+    double *x1;
+    x1 = calloc(2, sizeof(double));
+    x1[0] = -((1 + mu + gamma) * x[0] + x[0] * x[0] * x[0]) * exp(-b * x[0] * x[0]) + gamma * x[0] + eps * x[1];
+    x1[1] = -((1 + mu + gamma) * x[1] + x[1] * x[1] * x[1]) * exp(-b * x[1] * x[1]) + gamma * x[1] - eps * x[0];
     return x1;
 }
-
-double LMBKy(double y, void *params) {
-    Parameters *p = (Parameters*)params;
-    double mu = p->mu;
-    double gamma = p->gamma;
-    double b = p->b;
-    double y1;
-
-    y1 = -((1 + mu + gamma) * y + y * y * y) * exp(-b * y * y) + gamma * y;
-    
-    return y1;
-}
-
