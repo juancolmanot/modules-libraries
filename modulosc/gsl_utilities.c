@@ -4,6 +4,8 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_multifit.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_eigen.h>
 
 gsl_vector *gsl_linspace(double x0, double xN, double N){
     if (N <= 1) {
@@ -50,4 +52,34 @@ void gsl_regression_quadratic(double *x_data, double *y_data, unsigned int n, do
     gsl_vector_free(y);
     gsl_matrix_free(cov);
     gsl_vector_free(coeff);
+}
+
+gsl_vector *gsl_eigenvalues(gsl_matrix *A, int n) {
+
+    gsl_vector *eigval = gsl_vector_alloc(n);
+    gsl_matrix *eigvec = gsl_matrix_alloc(n, n);
+
+    gsl_eigen_symmv_workspace *w = gsl_eigen_symmv_alloc(n);
+    gsl_eigen_symmv(A, eigval, eigvec, w);
+    gsl_eigen_symmv_free(w);
+    gsl_eigen_symmv_sort(eigval, eigvec, GSL_EIGEN_SORT_ABS_ASC);
+
+    gsl_matrix_free(eigvec);
+    return eigval;
+    gsl_vector_free(eigval);
+}
+
+gsl_matrix *gsl_eigenvectors(gsl_matrix *A, int n) {
+    
+    gsl_vector *eigval = gsl_vector_alloc(n);
+    gsl_matrix *eigvec = gsl_matrix_alloc(n, n);
+
+    gsl_eigen_symmv_workspace *w = gsl_eigen_symmv_alloc(n);
+    gsl_eigen_symmv(A, eigval, eigvec, w);
+    gsl_eigen_symmv_free(w);
+    gsl_eigen_symmv_sort(eigval, eigvec, GSL_EIGEN_SORT_ABS_ASC);
+
+    gsl_vector_free(eigval);
+    return eigvec;
+    gsl_matrix_free(eigvec);
 }

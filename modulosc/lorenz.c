@@ -17,12 +17,12 @@ int lorenz(double t, double x[], double f[], void *params) {
     double sigma = p->a;
     double rho = p->b;
     double beta = p->c;
-    
+
     f[0] = sigma * (x[1] - x[0]);
     f[1] = ((rho - x[2]) * x[0]) - x[1];
     f[2] = (x[0] * x[1]) - beta * x[2];
 
-    return GSL_SUCCESS; 
+    return GSL_SUCCESS;
 }
 
 int jaclorenz(double t, double x[], double *dfdx, double dfdt[], void *params) {
@@ -56,4 +56,47 @@ void lorenzH(double x[], double f[], double *U, double *K) {
 
     *U = Ui;
     *K = Ki;
+}
+
+gsl_matrix *fundamental(double x[], void *params) {
+    Parameters *p = (Parameters*)params;
+    double sigma = p->a;
+    double rho = p->b;
+    double beta = p->c;
+
+    gsl_matrix *J = gsl_matrix_alloc(3, 3);
+    gsl_matrix_set(J, 0, 0, - sigma);
+    gsl_matrix_set(J, 0, 1, sigma);
+    gsl_matrix_set(J, 0, 2, 0.0);
+    gsl_matrix_set(J, 1, 0, rho - x[2]);
+    gsl_matrix_set(J, 1, 1, - 1.0);
+    gsl_matrix_set(J, 1, 2, - x[0]);
+    gsl_matrix_set(J, 2, 0, x[1]);
+    gsl_matrix_set(J, 2, 1, x[0]);
+    gsl_matrix_set(J, 2, 2, - beta);
+
+    gsl_
+}
+
+
+gsl_matrix *lorenz_J(double x[], void *params) {
+
+    Parameters *p = (Parameters*)params;
+    double sigma = p->a;
+    double rho = p->b;
+    double beta = p->c;
+
+    gsl_matrix *JL = gsl_matrix_alloc(3, 3);
+
+    gsl_matrix_set(JL, 0, 0, - sigma);
+    gsl_matrix_set(JL, 0, 1, sigma);
+    gsl_matrix_set(JL, 0, 2, 0.0);
+    gsl_matrix_set(JL, 1, 0, rho - x[2]);
+    gsl_matrix_set(JL, 1, 1, - 1.0);
+    gsl_matrix_set(JL, 1, 2, - x[0]);
+    gsl_matrix_set(JL, 2, 0, x[1]);
+    gsl_matrix_set(JL, 2, 1, x[0]);
+    gsl_matrix_set(JL, 2, 2, - beta);
+
+    return JL;
 }
