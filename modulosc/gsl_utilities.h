@@ -1,21 +1,43 @@
-#ifndef LINEAR_ALGEBRA_H
-#define LINEAR_ALGEBRA_H
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_eigen.h>
+#ifndef GSL_UTILITIES_H
+#define GSL_UTILITIES_H
 
-/* Linspace generator */
-gsl_vector *gsl_linspace(double x0, double xN, double N);
+#include <gsl/gsl_fit.h>
+#include <gsl/gsl_interp.h>
+#include <gsl/gsl_spline.h>
+#include <gsl/gsl_integration.h>
 
-/* Quadratic regression */
-void gsl_regression_quadratic(double *x_data, double *y_data, unsigned int n, double *coefficients);
+typedef struct {
+    gsl_interp *interp;
+    gsl_interp_accel *acc;
+    double *x;
+    double *y;
+    unsigned int n;
+} InterpData;
 
-/* Eigenvalues  of nxn square matrix A*/
-gsl_vector *gsl_eigenvalues(gsl_matrix *A, int n);
+double interp_funct(
+    double xi,
+    void *params
+);
 
-/* Eigenvectors of nxn square matrix A*/
-gsl_matrix *gsl_eigenvectors(gsl_matrix *A, int n);
+double gsl_integrate_from_arrays(
+    double xfit[],
+    double yfit[],
+    unsigned int n
+);
 
+void gsl_linear_regression(
+    double *x,
+    double *y,
+    unsigned int size,
+    double *m,
+    double *b
+);
+
+void gsl_regression_quadratic(
+    double xdat[],
+    double ydat[],
+    unsigned int n,
+    double coeff[]
+);
 
 #endif

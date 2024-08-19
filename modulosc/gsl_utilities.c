@@ -1,31 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+#include <gsl/gsl_fit.h>
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
+#include <gsl/gsl_multiroots.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_interp.h>
+#include <gsl/gsl_spline.h>
+#include <gsl/gsl_integration.h>
+#include "gsl_utilities.h"
 
-gsl_vector *gsl_linspace(double x0, double xN, double N){
-    if (N <= 1) {
-        fprintf(stderr, "Error: Number of points (N) should be greater than 1.\n");
-        return NULL;
-    }
-    if (xN <= x0) {
-        fprintf(stderr, "Error: xN should be greater than x0.\n");
-        return NULL;
-    }
-    
-    gsl_vector *x_space = gsl_vector_alloc(N);
-    double dx = (double)(xN - x0) / (N - 1);
-    for (unsigned int i = 0; i < N; i++){
-        gsl_vector_set(x_space, i, x0 + (double) i * dx);
-    }
-    return x_space; 
+void gsl_linear_regression(
+    double *x,
+    double *y,
+    unsigned int size,
+    double *m,
+    double *b
+)
+{
+    double c0, c1, cov00, cov01, cov11, sumsq;
+
+    gsl_fit_linear(x, 1, y, 1, size, &c0, &c1, &cov00, &cov01, &cov11, &sumsq);
+
+    *m = c1;
+    *b = c0;
 }
 
-void gsl_regression_quadratic(double *x_data, double *y_data, unsigned int n, double *coefficients) {
+void gsl_regression_quadratic(
+    double xdat[],
+    double ydat[],
+    unsigned int n,
+    double ci[]
+) {
     gsl_multifit_linear_workspace *work = gsl_multifit_linear_alloc(n, 3);
     gsl_matrix *X = gsl_matrix_alloc(n, 3);
     gsl_vector *y = gsl_vector_alloc(n);
@@ -34,18 +45,18 @@ void gsl_regression_quadratic(double *x_data, double *y_data, unsigned int n, do
     double chisq;
 
     for (size_t i = 0; i < n; ++i) {
-        double xi = x_data[i];
+        double xi = xdat[i];
         double xi2 = xi * xi;
         gsl_matrix_set(X, i, 0, 1.0);
         gsl_matrix_set(X, i, 1, xi);
         gsl_matrix_set(X, i, 2, xi2);
-        gsl_vector_set(y, i, y_data[i]);
+        gsl_vector_set(y, i, ydat[i]);
     }
 
     gsl_multifit_linear(X, y, coeff, cov, &chisq, work);
-    coefficients[0] = gsl_vector_get(coeff, 0);
-    coefficients[1] = gsl_vector_get(coeff, 1);
-    coefficients[2] = gsl_vector_get(coeff, 2);
+    ci[0] = gsl_vector_get(coeff, 0);
+    ci[1] = gsl_vector_get(coeff, 1);
+    ci[2] = gsl_vector_get(coeff, 2);
 
     gsl_multifit_linear_free(work);
     gsl_matrix_free(X);
@@ -54,32 +65,49 @@ void gsl_regression_quadratic(double *x_data, double *y_data, unsigned int n, do
     gsl_vector_free(coeff);
 }
 
-gsl_vector *gsl_eigenvalues(gsl_matrix *A, int n) {
-
-    gsl_vector *eigval = gsl_vector_alloc(n);
-    gsl_matrix *eigvec = gsl_matrix_alloc(n, n);
-
-    gsl_eigen_symmv_workspace *w = gsl_eigen_symmv_alloc(n);
-    gsl_eigen_symmv(A, eigval, eigvec, w);
-    gsl_eigen_symmv_free(w);
-    gsl_eigen_symmv_sort(eigval, eigvec, GSL_EIGEN_SORT_ABS_ASC);
-
-    gsl_matrix_free(eigvec);
-    return eigval;
-    gsl_vector_free(eigval);
+double interp_funct(
+    double xi,
+    void *params
+) {
+    InterpData *data = (InterpData *)params;
+    return gsl_interp_eval(data->interp, data->x, data->y, xi, data->acc);
 }
 
-gsl_matrix *gsl_eigenvectors(gsl_matrix *A, int n) {
-    
-    gsl_vector *eigval = gsl_vector_alloc(n);
-    gsl_matrix *eigvec = gsl_matrix_alloc(n, n);
+double gsl_integrate_from_arrays(
+    double xfit[],
+    double yfit[],
+    unsigned int n
+) {
+    // Create and initialize the interpolation object
+    gsl_interp *interp = gsl_interp_alloc(gsl_interp_linear, n);
+    gsl_interp_init(interp, xfit, yfit, n);
 
-    gsl_eigen_symmv_workspace *w = gsl_eigen_symmv_alloc(n);
-    gsl_eigen_symmv(A, eigval, eigvec, w);
-    gsl_eigen_symmv_free(w);
-    gsl_eigen_symmv_sort(eigval, eigvec, GSL_EIGEN_SORT_ABS_ASC);
+    // Create and initialize the accelerator
+    gsl_interp_accel *acc = gsl_interp_accel_alloc();
 
-    gsl_vector_free(eigval);
-    return eigvec;
-    gsl_matrix_free(eigvec);
+    // Create InterpData struct
+    InterpData data = {interp, acc, xfit, yfit, n};
+
+    // Define the integration workspace
+    gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(10000);
+
+    // Define the integration function
+    gsl_function F;
+    F.function = &interp_funct;
+    F.params = &data;
+
+    // Perform the integration
+    double result, error;
+    int status = gsl_integration_qags(&F, xfit[0], xfit[n - 1], 0, 1e-4, 10000, workspace, &result, &error);
+
+    if (status != GSL_SUCCESS) {
+        fprintf(stderr, "GSL integration error: %s\n", gsl_strerror(status));
+        // Handle error appropriately, e.g., by returning a special value or exiting
+    }
+
+    gsl_interp_free(interp);
+    gsl_interp_accel_free(acc);
+    gsl_integration_workspace_free(workspace);
+
+    return result;
 }
