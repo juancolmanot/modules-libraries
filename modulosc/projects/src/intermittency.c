@@ -3,11 +3,68 @@
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
+#include <complex.h>
 #include "intermittency.h"
 #include "stats.h"
 #include "progress_handle.h"
 #include "linear_algebra.h"
 #include "dynamical_systems.h"
+
+double type_I_xl_1(
+    double l,
+    double a,
+    double c,
+    double clam
+){
+    double C0, C1, C2;
+    C0 = sqrt(c / a);
+    C1 = atan(C0 * clam);
+    C2 = sqrt(c * a) * l;
+    return C0 * tan(C1 - C2);
+}
+
+double type_I_xl_2(
+    double l,
+    double a,
+    double b,
+    double c,
+    double clam
+){
+    double C0, C1, C2;
+    C0 = sqrt(-pow(b - 1, 2) + 4 * a * c);
+    C1 = 0.5 * C0 * l;
+    C2 = atan((-1 + b + 2 * a * clam) / C0);
+    return (1 - b - C0 * tan(C1 - C2)) / 2 * a;
+}
+
+double type_I_lx_2(
+    double x,
+    double a,
+    double b,
+    double c,
+    double clam
+)
+{
+    double C0, C1, C2;
+    C0 = 1 / sqrt(-pow(b - 1, 2) + 4 * a * c);
+    C1 = atan((b + 2 * a * clam - 1) / C0);
+    C2 = atan((b + 2 * a * x - 1) / C0);
+    return C0 * 2 * (C1 - C2);
+}
+
+double type_I_lx_1(
+    double x,
+    double a,
+    double eps,
+    double c
+)
+{
+    double C0, C1, C2;
+    C0 = 1 / sqrt(a * eps);
+    C1 = atan(sqrt(a / eps) * c);
+    C2 = atan(sqrt(a / eps) * x);
+    return C0 * (C1 - C2);
+}
 
 bool reinjection_1d(
     long double xn,
@@ -1068,4 +1125,98 @@ void rpd_funct_3d_fixedpoints_multiple(
     free(yreinjected);
     free(xn);
     free(xn1);
+}
+
+void compute_m_function(
+    long double *x,
+    long double *Mx,
+    unsigned int rows
+)
+{
+    long double Mxi = 0.0;
+    for (unsigned int i = 0; i < rows; i++) {
+        Mxi += x[i];
+        Mx[i] = Mxi / (long double)(i + 1);
+    }
+}
+
+void compute_rpd_numerical(
+    long double *x,
+    unsigned int x_size,
+    long double *x_rpd,
+    long double *rpd,
+    unsigned int rpd_size,
+    long double wi
+)
+{
+    long double xmin, xmax, dx;
+    xmin = la_min(x, x_size);
+    xmax = la_max(x, x_size);
+    dx = (xmax - xmin) / (long double)(rpd_size - 1);
+    for (unsigned int i = 0; i < rpd_size - 1; i++) {
+        x_rpd[i] = xmin + dx * (long double)i;
+    }
+    stats_histogram(rpd, x_rpd, x, x_size, rpd_size);
+
+    // Normalize RPD
+    unsigned int mtecarlopoints = 10000;
+    long double integral_rpd = montecarlo_integration_long(
+        x_rpd,
+        rpd,
+        rpd_size - 2,
+        mtecarlopoints
+    );
+    long double const_norm = wi / integral_rpd;
+    for (unsigned int i = 1; i < rpd_size; i++) {
+        rpd[i] = rpd[i] * const_norm;
+    }
+}
+
+void compute_rpd_theoretical(
+    long double *x_rpd,
+    long double *rpd,
+    unsigned int rpd_size,
+    long double alpha,
+    long double xci,
+    long double wi
+)
+{
+    for (unsigned int i = 0; i < rpd_size; i++) {
+        rpd[i] = powl(fabsl(x_rpd[i] - xci), alpha);
+    }
+    // Normalize RPD
+    unsigned int mtecarlopoints = 10000;
+    long double integral_rpd = montecarlo_integration_long(
+        x_rpd,
+        rpd,
+        rpd_size - 2,
+        mtecarlopoints
+    );
+    long double const_norm = wi / integral_rpd;
+    for (unsigned int i = 1; i < rpd_size; i++) {
+        rpd[i] = rpd[i] * const_norm;
+    }
+
+}
+
+long double rpd_theoretical_integral(
+    long double alpha,
+    long double xc,
+    long double ubound,
+    long double lbound
+){
+    
+    long double integ = 0.0;
+
+    long double C0 = cabsl(cpowl(ubound - xc, alpha + 1.0));
+    long double C1 = cabsl(cpowl(lbound - xc, alpha + 1.0));
+
+    if (alpha == -1.0 && lbound < xc && ubound > xc) {
+        integ = logl(fabsl((ubound - xc) / (lbound - xc)));
+    }
+    else {
+        integ = (C0 - C1) / (alpha + 1.0);
+    }
+
+    return integ;
 }

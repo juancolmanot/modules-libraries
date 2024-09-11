@@ -42,7 +42,7 @@ typedef struct {
 } Parameters4;
 
 typedef struct {
-    unsigned int n_steps;
+    long unsigned int max_steps;
     double t_stationary;
     double t_transient;
     double sigma;
@@ -52,6 +52,45 @@ typedef struct {
     double atol;
     double rtol;
 } Parameters5;
+
+typedef struct {
+    long unsigned int max_steps;
+    double t_stationary;
+    double t_transient;
+    double sigma;
+    double rho;
+    double beta;
+    double h;
+    double atol;
+    double rtol;
+    double xmin;
+    double xmax;
+    unsigned int rtarget;
+} Parameters6;
+
+typedef struct {
+    int n_regions;
+    int n_centers;
+    unsigned int npoints;
+    int current_zone;
+    double *xmins;
+    double *xmaxs;
+    double *xc;
+    unsigned int *region_bins;
+} Parameters7;
+
+typedef struct {
+    int n_regions;
+    int n_centers;
+    unsigned int npoints;
+    int current_zone;
+    double *xmins_fit;
+    double *xmaxs_fit;
+    double *xmins_domain;
+    double *xmaxs_domain;
+    double *xc;
+    unsigned int *region_bins;
+} Parameters8;
 
 int handler1(
     void *user,
@@ -82,6 +121,27 @@ int handler4(
 );
 
 int handler5(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+int handler6(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+int handler7(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+int handler8(
     void *user,
     const char* section,
     const char* name,

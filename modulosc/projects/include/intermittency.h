@@ -1,6 +1,46 @@
 #ifndef INTERMITTENCY_H
 #define INTERMITTENCY_H
 
+double type_I_xl_1(
+    double l,
+    double a,
+    double c,
+    double clam
+);
+
+double type_I_xl_2(
+    double l,
+    double a,
+    double b,
+    double c,
+    double clam
+);
+
+double type_I_lx_1(
+    double x,
+    double a,
+    double eps,
+    double c
+);
+
+double type_I_lx_2(
+    double x,
+    double a,
+    double b,
+    double c,
+    double clam
+);
+
+long double rpd_long(
+    long double x,
+    void *params
+);
+
+double rpd(
+    double x,
+    void *params
+);
+
 bool reinjection_1d(
     long double xn,
     long double xn1,
@@ -307,6 +347,28 @@ void rpd_funct_3d_fixedpoints_multiple(
     long double **fixed_point,
     unsigned int npoints,
     long double c
+);
+
+void compute_m_function(
+    long double *x,
+    long double *Mx,
+    unsigned int rows
+);
+
+void compute_rpd_numerical(
+    long double *x,
+    unsigned int x_size,
+    long double *x_rpd,
+    long double *rpd,
+    unsigned int rpd_size,
+    long double wi
+);
+
+long double rpd_theoretical_integral(
+    long double alpha,
+    long double xc,
+    long double ubound,
+    long double lbound
 );
 
 #endif

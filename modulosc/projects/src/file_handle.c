@@ -118,3 +118,55 @@ void read_data_file_unsigned(
     
     fclose(file);
 }
+
+void read_data_file_unsigned_double(
+    const char *filename,
+    double ***data,
+    unsigned int *rows,
+    unsigned int *cols
+){
+    FILE *file = fopen(filename, "r");
+    if (file == NULL){
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    
+    unsigned int col_count = 0;
+    unsigned int row_count = 0;
+    char line[1024];
+    if (fgets(line, sizeof(line), file) != NULL){
+        char *token = strtok(line, " \t\n");
+        while (token != NULL){
+            col_count++;
+            token = strtok(NULL, " \t\n");
+        }
+    row_count++;
+    }
+    
+    while (fgets(line, sizeof(line), file) != NULL){
+        row_count++;
+    }
+    rewind(file);
+
+    *data = (double **)malloc((long unsigned int)row_count * sizeof(double *));
+    for (unsigned int i = 0; i < row_count; i++){
+        (*data)[i] = (double *)malloc((long unsigned int)col_count * sizeof(double));
+    }
+    
+    unsigned int row = 0;
+    while (fgets(line, sizeof(line), file) != NULL){
+        unsigned int col = 0;
+        char *token = strtok(line, " \t\n");
+        while (token != NULL) {
+            (*data)[row][col] = strtod(token, NULL);
+            col++;
+            token = strtok(NULL, " \t\n");
+        }
+        row++;
+    }
+    
+    *rows = row_count;
+    *cols = col_count;
+    
+    fclose(file);
+}

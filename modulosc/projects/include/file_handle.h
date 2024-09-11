@@ -19,4 +19,11 @@ void read_data_file_unsigned(
     unsigned int *cols
 );
 
+void read_data_file_unsigned_double(
+    const char *filename,
+    double ***data,
+    unsigned int *rows,
+    unsigned int *cols
+);
+
 #endif

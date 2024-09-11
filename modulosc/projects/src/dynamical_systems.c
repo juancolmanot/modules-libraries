@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "kimkye.h"
 #include "linear_algebra.h"
 #include "dynamical_systems.h"
 

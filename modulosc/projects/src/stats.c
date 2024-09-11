@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 #include "stats.h"
 #include "linear_algebra.h"
 
@@ -49,19 +51,19 @@ void stats_histogram(
     unsigned int data_size,
     unsigned int xsize
 ){
-    long double xmax = 0, xmin = 0;
+    /*long double xmax = 0, xmin = 0;
     xmax = la_max(data, data_size);
     xmin = la_min(data, data_size);
-    
-    long double dx = (xmax - xmin) / (long double) (xsize - 1);
+    */
+    //long double dx = (xmax - xmin) / (long double) (xsize - 1);
 
     for (unsigned int i = 0; i < xsize - 1; i++) {
         for (unsigned int j = 0; j < data_size; j++) {
-            if (data[j] > (xmin + dx * i) && data[j] < (xmin + dx * (i + 1))) {
+            if (data[j] > x[i] && data[j] < x[i + 1]) {
                 y[i]++;
             }
         }
-        x[i] = xmin + dx * i;
+        //x[i] = xmin + dx * i;
     }
 }
 
@@ -97,7 +99,7 @@ void linear_regression(
 ){
     long double sumx, sumy, sumxy, sumx2;
     sumx = sumy = sumxy = sumx2 = 0;
-    
+
     for (unsigned int i = 0; i < size; i++){
         sumx += x[i];
         sumy += y[i];
@@ -107,6 +109,26 @@ void linear_regression(
     
     *m = ((long double)size * sumxy - sumx * sumy) / ((long double)size * sumx2 - sumx * sumx);
     *b = (sumy - *m * sumx) / (long double)size;
+}
+
+void linear_regression_double(
+    double *x,
+    double *y,
+    unsigned int size,
+    double *m,
+    double *b
+){
+    double sumx, sumy, sumxy, sumx2;
+    sumx = sumy = sumxy = sumx2 = 0;
+    for (unsigned int i = 0; i < size; i++){
+        sumx += x[i];
+        sumy += y[i];
+        sumxy += x[i] * y[i];
+        sumx2 += x[i] * x[i];
+    }
+    
+    *m = ((double)size * sumxy - sumx * sumy) / ((double)size * sumx2 - sumx * sumx);
+    *b = (sumy - *m * sumx) / (double)size;
 }
 
 void quadratic_regression(
@@ -136,4 +158,329 @@ void quadratic_regression(
     ci[0] = detA / det; // coefficient for x^2 (a)
     ci[1] = detB / det; // coefficient for x (b)
     ci[2] = detC / det; // constant term (c)
+}
+
+void bubble_sort(
+    long double *arr,
+    int n
+) {
+    int i, j;
+    long double temp;
+    for (i = 0; i < n-1; i++) {
+        for (j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+void bubble_sort_double_unsigned(
+    double *arr,
+    unsigned int n
+) {
+    unsigned int i, j;
+    double temp;
+    for (i = 0; i < n-1; i++) {
+        for (j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                // Swap arr[j] and arr[j+1]
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+//===================================================
+// Swap function for quick sort algorithm.
+//===================================================
+void swap(
+    double *a,
+    double *b
+)
+{
+    double temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void swap_long(
+    long double *a,
+    long double *b
+)
+{
+    long double temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+//===================================================
+// Partition function for quick sort algorithm.
+//===================================================
+int partition(
+    double arr[],
+    int low,
+    int high
+)
+{
+    double pivot = arr[high];
+    int i = low - 1;
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+int partition_long(
+    long double arr[],
+    int low,
+    int high
+)
+{
+    long double pivot = arr[high];
+    int i = low - 1;
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap_long(&arr[i], &arr[j]);
+        }
+    }
+    swap_long(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+//===================================================
+// Quicksort algorithm function.
+//===================================================
+void quicksort(
+    double arr[],
+    int low,
+    int high
+)
+{
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quicksort(arr, low, pi - 1);
+        quicksort(arr, pi + 1, high);
+    }
+}
+
+void quicksort_long(
+    long double arr[],
+    int low,
+    int high
+)
+{
+    if (low < high) {
+        int pi = partition_long(arr, low, high);
+        quicksort_long(arr, low, pi - 1);
+        quicksort_long(arr, pi + 1, high);
+    }
+}
+
+//===================================================
+// Wrapper function to call quicksort.
+//===================================================
+void quicksort_double_unsigned(
+    double *arr,
+    unsigned int n
+)
+{
+    quicksort(arr, 0, (int)(n - 1));
+}
+
+void quicksort_long_unsigned(
+    long double *arr,
+    unsigned int n
+)
+{
+    quicksort_long(arr, 0, (int)(n - 1));
+}
+
+//===================================================
+// MONTECARLO integrator.
+//===================================================
+double montecarlo_integration(
+    double x[],
+    double fx[],
+    unsigned int n,
+    unsigned int n_samples
+)
+{
+    // Initialize random number generator
+    srand((unsigned int)time(NULL));
+
+    // Determine the range of integration
+    double x_min = x[0];
+    double x_max = x[n - 1];
+
+     // Sum of function values at random points
+    double sum_fx = 0.0;
+
+    for (unsigned int i = 0; i < n_samples; i++) {
+        // Generate a random x value within the range
+        double x_random = x_min + (x_max - x_min) * ((double)rand() / RAND_MAX);
+
+        // Interpolate the function value at the random x
+        double f_random = 0.0;
+        for (unsigned int j = 1; j < n - 2; j++) {
+            if (x_random >= x[j] && x_random <= x[j + 1]) {
+                double t = (x_random - x[j]) / (x[j + 1] - x[j]);
+                f_random = (1 - t) * fx[j] + t * fx[j + 1];
+                break;
+            }
+        }
+
+        // Accumulate the function values
+        if (isnanl(f_random) != 1 && isinfl(f_random) != 1){
+            sum_fx += f_random;
+        }
+    }
+
+    // Estimate the integral
+    double integral = (x_max - x_min) * sum_fx / n_samples;
+
+    return integral;
+}
+
+long double montecarlo_integration_long(
+    long double x[],
+    long double fx[],
+    unsigned int n,
+    unsigned int n_samples
+)
+{
+    // Initialize random number generator
+    srand((unsigned int)time(NULL));
+
+    // Determine the range of integration
+    long double x_min = x[0];
+    long double x_max = x[n - 1];
+
+    // Sum of function values at random points
+    long double sum_fx = 0.0;
+
+    unsigned int actualcount = 0;
+
+    for (unsigned int i = 0; i < n_samples; i++) {
+        
+        // Generate a random x value within the range
+        long double x_random = x_min + (x_max - x_min) * ((long double)rand() / RAND_MAX);
+
+        // Interpolate the function value at the random x
+        long double f_random = 0.0;
+        for (unsigned int j = 0; j < n - 1; j++) {
+            if (x_random >= x[j] && x_random <= x[j + 1]) {
+                long double t = (x_random - x[j]) / (x[j + 1] - x[j]);
+                f_random = (1 - t) * fx[j] + t * fx[j + 1];
+                //printf("%d %d %Lf\n", i, j, f_random);
+                break;
+            }
+        }
+
+        // Accumulate the function values
+
+        if (f_random < 1e6 && f_random != 0){
+            sum_fx += f_random;
+            actualcount++;
+        }
+    }
+
+    // Estimate the integral
+    long double integral = (x_max - x_min) * sum_fx / (long double)actualcount;
+
+    return integral;
+}
+
+long double montecarlo_integration_alternative_long(
+    long double x[],
+    long double fx[],
+    unsigned int n,
+    unsigned int n_samples
+)
+{
+    // Determine the range of integration
+    long double x_min = x[0];
+    long double x_max = x[n - 1];
+    long double fx_max = -100000.0;
+    fx_max = la_max(fx, n);
+
+    // Initialize random number generator
+    srand((unsigned int)time(NULL));
+
+    unsigned int actualcount = 0;
+
+    for (unsigned int i = 0; i < n_samples; i++) {
+        // Generate a random x value within the range
+        long double x_random = x_min + (x_max - x_min) * ((long double)rand() / RAND_MAX);
+        long double fx_random = fx_max * ((long double)rand() / RAND_MAX);
+
+        for (unsigned int j = 0; j < n - 1; j++) {
+            if (x_random > x[j] && x_random < x[j + 1]) {
+                if (fx_random < fx[j]) {
+                    actualcount++;
+                }
+            }
+            break;
+        }
+    }
+    long double area_square = fx_max * (x_max - x_min);
+    long double integral = (long double)(actualcount / n_samples);
+    integral *= area_square;
+
+    return integral;
+}
+
+/*
+Compute the Root Mean Squared Error between
+two datasets, xnum and xtheoric of size n.
+*/
+
+long double RMSE(
+    long double *xnum,
+    long double *xtheoric,
+    unsigned int n
+)
+{
+    long double rmse = 0.0;
+    for (unsigned int i = 0; i < n; i++) {
+        rmse += ((xnum[i] - xtheoric[i]) * (xnum[i] - xtheoric[i]));
+    }
+
+    return sqrtl(rmse / n);
+}
+
+long double normalize_histogram(
+    long double *x,
+    long double *y,
+    unsigned int size,
+    long double w
+)
+{
+    unsigned int mtecarlopoints = 10000;
+    long double integral = montecarlo_integration_long(x, y, size, mtecarlopoints);
+    long double b = w / integral;
+    return b;
+}
+
+double normalize_histogram_double(
+    double *x,
+    double *y,
+    unsigned int size,
+    double w
+)
+{
+    unsigned int mtecarlopoints = 10000;
+    double integral = montecarlo_integration(x, y, size, mtecarlopoints);
+    double b = w / integral;
+    return b;
 }
