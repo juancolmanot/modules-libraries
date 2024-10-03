@@ -133,4 +133,39 @@ long double montecarlo_integration_long(
     unsigned int n_samples
 );
 
+long double montecarlo_integration_alternative_long(
+    long double x[],
+    long double fx[],
+    unsigned int n,
+    unsigned int n_samples
+);
+
+/*
+Compute the Root Mean Squared Error between
+two datasets, xnum and xtheoric of size n.
+*/
+long double RMSE(
+    long double *xnum,
+    long double *xtheoric,
+    unsigned int n
+);
+
+/*
+Normalize histogram. Find constant b such that the
+area below the histogram is equal to w.
+*/
+long double normalize_histogram(
+    long double *x,
+    long double *y,
+    unsigned int size,
+    long double w
+);
+
+double normalize_histogram_double(
+    double *x,
+    double *y,
+    unsigned int size,
+    double w
+);
+
 #endif

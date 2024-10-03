@@ -1,6 +1,8 @@
 #ifndef GSL_UTILITIES_H
 #define GSL_UTILITIES_H
 
+#include <stdio.h>
+#include <math.h>
 #include <gsl/gsl_fit.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>

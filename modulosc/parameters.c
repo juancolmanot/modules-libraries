@@ -373,6 +373,55 @@ int handler8(
     return 1;
 }
 
+int handler9(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+){
+    Parameters9 *p = (Parameters9*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("general", "n_regions")) {
+        p->n_regions = (int)strtoul(value, NULL, 10);
+        p->xmins_regions = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        p->xmaxs_regions = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        p->bins = (int*)malloc((size_t)p->n_regions * sizeof(int));
+        if (p->xmins_regions == NULL || p->xmaxs_regions == NULL) {
+            perror("xmins_regions and/or xmaxs_regions memory allocation failed\n");
+            exit(1);
+        }
+        if (p->bins == NULL) {
+            perror("bins memory allocation failed\n");
+            exit(1);
+        }
+    }
+    else {
+        char region_name[64];
+        char bins_name[64];
+        for (int i = 0; i < p->n_regions; i++) {
+            snprintf(region_name, sizeof(region_name), "xmin%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmins_regions[i] = strtod(value, NULL);
+                return 1;
+            }
+            snprintf(region_name, sizeof(region_name), "xmax%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmaxs_regions[i] = strtod(value, NULL);
+                return 1;
+            }
+            snprintf(bins_name, sizeof(bins_name), "bins%u", i + 1);
+            if (MATCH("bins", bins_name)) {
+                p->bins[i] = (int)strtoul(value, NULL, 10);
+                return 1;
+            }
+        }
+        return 0; // unknown section/name, error
+    }
+
+    return 1;
+}
+
 void load_parameters_from_file(
     const char* filename,
     void *params,

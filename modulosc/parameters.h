@@ -92,6 +92,16 @@ typedef struct {
     unsigned int *region_bins;
 } Parameters8;
 
+/* Type of parameters struct for separating
+regions of map x(n - 1) vs x(n) and isolating
+effects on M and RPD functions.*/
+typedef struct {
+    int n_regions;
+    double *xmins_regions;
+    double *xmaxs_regions;
+    int *bins;
+} Parameters9;
+
 int handler1(
     void *user,
     const char* section,
@@ -142,6 +152,14 @@ int handler7(
 );
 
 int handler8(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+/* Deals with loading parameters of type 9 */
+int handler9(
     void *user,
     const char* section,
     const char* name,

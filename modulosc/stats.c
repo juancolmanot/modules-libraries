@@ -51,19 +51,19 @@ void stats_histogram(
     unsigned int data_size,
     unsigned int xsize
 ){
-    long double xmax = 0, xmin = 0;
+    /*long double xmax = 0, xmin = 0;
     xmax = la_max(data, data_size);
     xmin = la_min(data, data_size);
-    
-    long double dx = (xmax - xmin) / (long double) (xsize - 1);
+    */
+    //long double dx = (xmax - xmin) / (long double) (xsize - 1);
 
     for (unsigned int i = 0; i < xsize - 1; i++) {
         for (unsigned int j = 0; j < data_size; j++) {
-            if (data[j] > (xmin + dx * i) && data[j] < (xmin + dx * (i + 1))) {
+            if (data[j] > x[i] && data[j] < x[i + 1]) {
                 y[i]++;
             }
         }
-        x[i] = xmin + dx * i;
+        //x[i] = xmin + dx * i;
     }
 }
 
@@ -332,7 +332,7 @@ double montecarlo_integration(
 
         // Interpolate the function value at the random x
         double f_random = 0.0;
-        for (unsigned int j = 0; j < n - 1; j++) {
+        for (unsigned int j = 1; j < n - 2; j++) {
             if (x_random >= x[j] && x_random <= x[j + 1]) {
                 double t = (x_random - x[j]) / (x[j + 1] - x[j]);
                 f_random = (1 - t) * fx[j] + t * fx[j + 1];
@@ -372,6 +372,7 @@ long double montecarlo_integration_long(
     unsigned int actualcount = 0;
 
     for (unsigned int i = 0; i < n_samples; i++) {
+        
         // Generate a random x value within the range
         long double x_random = x_min + (x_max - x_min) * ((long double)rand() / RAND_MAX);
 
@@ -381,13 +382,14 @@ long double montecarlo_integration_long(
             if (x_random >= x[j] && x_random <= x[j + 1]) {
                 long double t = (x_random - x[j]) / (x[j + 1] - x[j]);
                 f_random = (1 - t) * fx[j] + t * fx[j + 1];
+                //printf("%d %d %Lf\n", i, j, f_random);
                 break;
             }
         }
 
         // Accumulate the function values
 
-        if (f_random < 1e7){
+        if (f_random < 1e6 && f_random != 0){
             sum_fx += f_random;
             actualcount++;
         }
@@ -397,4 +399,88 @@ long double montecarlo_integration_long(
     long double integral = (x_max - x_min) * sum_fx / (long double)actualcount;
 
     return integral;
+}
+
+long double montecarlo_integration_alternative_long(
+    long double x[],
+    long double fx[],
+    unsigned int n,
+    unsigned int n_samples
+)
+{
+    // Determine the range of integration
+    long double x_min = x[0];
+    long double x_max = x[n - 1];
+    long double fx_max = -100000.0;
+    fx_max = la_max(fx, n);
+
+    // Initialize random number generator
+    srand((unsigned int)time(NULL));
+
+    unsigned int actualcount = 0;
+
+    for (unsigned int i = 0; i < n_samples; i++) {
+        // Generate a random x value within the range
+        long double x_random = x_min + (x_max - x_min) * ((long double)rand() / RAND_MAX);
+        long double fx_random = fx_max * ((long double)rand() / RAND_MAX);
+
+        for (unsigned int j = 0; j < n - 1; j++) {
+            if (x_random > x[j] && x_random < x[j + 1]) {
+                if (fx_random < fx[j]) {
+                    actualcount++;
+                }
+            }
+            break;
+        }
+    }
+    long double area_square = fx_max * (x_max - x_min);
+    long double integral = (long double)(actualcount / n_samples);
+    integral *= area_square;
+
+    return integral;
+}
+
+/*
+Compute the Root Mean Squared Error between
+two datasets, xnum and xtheoric of size n.
+*/
+
+long double RMSE(
+    long double *xnum,
+    long double *xtheoric,
+    unsigned int n
+)
+{
+    long double rmse = 0.0;
+    for (unsigned int i = 0; i < n; i++) {
+        rmse += ((xnum[i] - xtheoric[i]) * (xnum[i] - xtheoric[i]));
+    }
+
+    return sqrtl(rmse / n);
+}
+
+long double normalize_histogram(
+    long double *x,
+    long double *y,
+    unsigned int size,
+    long double w
+)
+{
+    unsigned int mtecarlopoints = 10000;
+    long double integral = montecarlo_integration_long(x, y, size, mtecarlopoints);
+    long double b = w / integral;
+    return b;
+}
+
+double normalize_histogram_double(
+    double *x,
+    double *y,
+    unsigned int size,
+    double w
+)
+{
+    unsigned int mtecarlopoints = 10000;
+    double integral = montecarlo_integration(x, y, size, mtecarlopoints);
+    double b = w / integral;
+    return b;
 }
