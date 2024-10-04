@@ -293,6 +293,63 @@ int handler7(
     return 1;
 }
 
+int handler7a(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+){
+    Parameters7a *p = (Parameters7a*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("general", "n_regions")) {
+        p->n_regions = (int)strtoul(value, NULL, 10);
+        p->xmins = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        p->xmaxs = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        if (p->xmins == NULL || p->xmaxs == NULL) {
+            perror("xmins or/and xmaxs memory allocation failed\n");
+            exit(1);
+        }
+    }
+    else if (MATCH("general", "n_centers")) {
+        p->n_centers = (int)strtoul(value, NULL, 10);
+        p->xc = (double*)malloc((size_t)p->n_centers * sizeof(double));
+        if (p->xc == NULL) {
+            perror("xc memory allocation failed\n");
+            exit(1);
+        }
+    }
+    else if (MATCH("general", "wi")) {
+        p->wi = strtod(value, NULL);
+    }
+    else {
+        char region_name[64];
+        char center_name[64];
+        for (int i = 0; i < p->n_regions; i++) {
+            snprintf(region_name, sizeof(region_name), "xmin%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmins[i] = strtod(value, NULL);
+                return 1;
+            }
+            snprintf(region_name, sizeof(region_name), "xmax%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmaxs[i] = strtod(value, NULL);
+                return 1;
+            }
+        }
+
+        for (int i = 0; i < p->n_centers; i++) {
+            snprintf(center_name, sizeof(center_name), "xc%u", i + 1);
+            if (MATCH("centers", center_name)) {
+                p->xc[i] = strtod(value, NULL);
+                return 1;
+            }
+        }
+        return 0; // unknown section/name, error
+    }
+    return 1;
+}
+
 int handler8(
     void *user,
     const char* section,
@@ -413,6 +470,62 @@ int handler9(
             snprintf(bins_name, sizeof(bins_name), "bins%u", i + 1);
             if (MATCH("bins", bins_name)) {
                 p->bins[i] = (int)strtoul(value, NULL, 10);
+                return 1;
+            }
+        }
+        return 0; // unknown section/name, error
+    }
+
+    return 1;
+}
+
+int handler10(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+){
+    Parameters10 *p = (Parameters10*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("general", "n_regions")) {
+        p->n_regions = (int)strtoul(value, NULL, 10);
+        p->xmins_regions = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        p->xmaxs_regions = (double*)malloc((size_t)p->n_regions * sizeof(double));
+        p->bins = (int*)malloc((size_t)p->n_regions * sizeof(int));
+        p->wi = (long double*)malloc((size_t)p->n_regions * sizeof(long double));
+        if (p->xmins_regions == NULL || p->xmaxs_regions == NULL) {
+            perror("xmins_regions and/or xmaxs_regions memory allocation failed\n");
+            exit(1);
+        }
+        if (p->bins == NULL || p->wi == NULL) {
+            perror("bins and/or wi memory allocation failed\n");
+            exit(1);
+        }
+    }
+    else {
+        char region_name[64];
+        char bins_name[64];
+        char wi_name[64];
+        for (int i = 0; i < p->n_regions; i++) {
+            snprintf(region_name, sizeof(region_name), "xmin%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmins_regions[i] = strtod(value, NULL);
+                return 1;
+            }
+            snprintf(region_name, sizeof(region_name), "xmax%u", i + 1);
+            if (MATCH("regions", region_name)) {
+                p->xmaxs_regions[i] = strtod(value, NULL);
+                return 1;
+            }
+            snprintf(bins_name, sizeof(bins_name), "bins%u", i + 1);
+            if (MATCH("bins", bins_name)) {
+                p->bins[i] = (int)strtoul(value, NULL, 10);
+                return 1;
+            }
+            snprintf(wi_name, sizeof(wi_name), "wi%u", i + 1);
+            if (MATCH("wi", wi_name)) {
+                p->wi[i] = strtold(value, NULL);
                 return 1;
             }
         }

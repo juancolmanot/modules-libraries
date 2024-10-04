@@ -82,6 +82,15 @@ typedef struct {
 typedef struct {
     int n_regions;
     int n_centers;
+    double wi;
+    double *xmins;
+    double *xmaxs;
+    double *xc;
+} Parameters7a;
+
+typedef struct {
+    int n_regions;
+    int n_centers;
     unsigned int npoints;
     int current_zone;
     double *xmins_fit;
@@ -101,6 +110,14 @@ typedef struct {
     double *xmaxs_regions;
     int *bins;
 } Parameters9;
+
+typedef struct {
+    int n_regions;
+    double *xmins_regions;
+    double *xmaxs_regions;
+    int *bins;
+    long double *wi;
+} Parameters10;
 
 int handler1(
     void *user,
@@ -151,6 +168,13 @@ int handler7(
     const char* value
 );
 
+int handler7a(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
 int handler8(
     void *user,
     const char* section,
@@ -160,6 +184,13 @@ int handler8(
 
 /* Deals with loading parameters of type 9 */
 int handler9(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+int handler10(
     void *user,
     const char* section,
     const char* name,
