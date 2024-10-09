@@ -178,6 +178,53 @@ int handler5(
     return 1;
 }
 
+int handler5a(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+){
+    Parameters5a *p = (Parameters5a*)user;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("general", "n_steps")) {
+        p->n_steps = strtoul(value, NULL, 10);
+    }
+    else if (MATCH("general", "t_stationary")) {
+        p->t_stationary = strtod(value, NULL);
+    }
+    else if (MATCH("general", "t_transient")) {
+        p->t_transient = strtod(value, NULL);
+    }
+    else if (MATCH("general", "sigma")) {
+        p->sigma = strtod(value, NULL);
+    }    
+    else if (MATCH("general", "beta")) {
+        p->beta = strtod(value, NULL);
+    }
+    else if (MATCH("general", "h")) {
+        p->h = strtod(value, NULL);
+    }
+    else if (MATCH("general", "atol")) {
+        p->atol = strtod(value, NULL);
+    }
+    else if (MATCH("general", "rtol")) {
+        p->rtol = strtod(value, NULL);
+    }
+    else if (MATCH("general", "rho_init")) {
+        p->rho_init = strtod(value, NULL);
+    }
+    else if (MATCH("general", "rho_final")) {
+        p->rho_final = strtod(value, NULL);
+    }
+    else if (MATCH("general", "n_rho")) {
+        p->n_rho = (unsigned int)strtoul(value, NULL, 10);
+    } else {
+        return 0;  // unknown section/name, error
+    }
+    return 1;
+}
+
 int handler6(
     void *user,
     const char* section,

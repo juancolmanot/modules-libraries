@@ -54,6 +54,20 @@ typedef struct {
 } Parameters5;
 
 typedef struct {
+    long unsigned int n_steps;
+    double t_stationary;
+    double t_transient;
+    double sigma;
+    double beta;
+    double h;
+    double atol;
+    double rtol;
+    double rho_init;
+    double rho_final;
+    unsigned int n_rho;
+} Parameters5a;
+
+typedef struct {
     long unsigned int max_steps;
     double t_stationary;
     double t_transient;
@@ -148,6 +162,13 @@ int handler4(
 );
 
 int handler5(
+    void *user,
+    const char* section,
+    const char* name,
+    const char* value
+);
+
+int handler5a(
     void *user,
     const char* section,
     const char* name,
